@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const CONFIG_FILE = path.join(process.env.HOME || process.env.USERPROFILE, '.mimo-tts-config.json');
+const CACHE_TTL_MS = 5000;
 
 const defaultConfig = {
   apiKey: process.env.MIMO_API_KEY || '',
@@ -16,21 +17,44 @@ const defaultConfig = {
   proxy: null
 };
 
+let configCache = null;
+let configCacheTime = 0;
+
+function loadPersistedKeyIndex() {
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+      if (typeof raw._keyIndex === 'number') keyIndex = raw._keyIndex;
+    }
+  } catch {}
+}
+loadPersistedKeyIndex();
+
 function loadConfig() {
+  const now = Date.now();
+  if (configCache && (now - configCacheTime) < CACHE_TTL_MS) {
+    return configCache;
+  }
   try {
     if (fs.existsSync(CONFIG_FILE)) {
       const saved = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-      return { ...defaultConfig, ...saved };
+      configCache = { ...defaultConfig, ...saved };
+    } else {
+      configCache = { ...defaultConfig };
     }
   } catch (err) {
     console.error('Warning: Could not load config file:', err.message);
+    configCache = { ...defaultConfig };
   }
-  return { ...defaultConfig };
+  configCacheTime = now;
+  return configCache;
 }
 
 function saveConfig(config) {
   try {
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+    configCache = config;
+    configCacheTime = Date.now();
     return true;
   } catch (err) {
     console.error('Error: Could not save config file:', err.message);
@@ -50,13 +74,32 @@ function setConfigValue(key, value) {
 }
 
 let keyIndex = 0;
+let keyIndexDirty = 0;
+
 function getNextApiKey() {
   const config = loadConfig();
   const keys = config.apiKeys || [];
   if (keys.length === 0) return config.apiKey || '';
   const key = keys[keyIndex % keys.length];
   keyIndex++;
+  keyIndexDirty++;
+  if (keyIndexDirty >= 10) {
+    persistKeyIndex();
+  }
   return key;
+}
+
+function persistKeyIndex() {
+  if (keyIndexDirty === 0) return;
+  try {
+    const raw = fs.existsSync(CONFIG_FILE)
+      ? JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'))
+      : {};
+    raw._keyIndex = keyIndex;
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(raw, null, 2));
+    if (configCache) configCache._keyIndex = keyIndex;
+    keyIndexDirty = 0;
+  } catch {}
 }
 
 function addApiKey(key) {
@@ -81,6 +124,11 @@ function removeApiKey(key) {
   return false;
 }
 
+function clearConfigCache() {
+  configCache = null;
+  configCacheTime = 0;
+}
+
 module.exports = {
   loadConfig,
   saveConfig,
@@ -89,6 +137,8 @@ module.exports = {
   getNextApiKey,
   addApiKey,
   removeApiKey,
+  clearConfigCache,
+  persistKeyIndex,
   CONFIG_FILE,
   defaultConfig
 };

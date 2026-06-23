@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const api = require('./api');
-const { textSimilarity } = require('./text-similarity');
+const { textSimilarity, similarityToScore } = require('./text-similarity');
 
 const TESTS = [
   { id: 1,  category: '日常口语',   text: '你好，今天天气怎么样？' },
@@ -21,7 +21,6 @@ const TESTS = [
   { id: 15, category: '天气预报',   text: '今天白天多云转晴，最高气温32度，最低气温24度，东南风3到4级，空气质量良好。' },
 ];
 
-const SAMPLE_RATE = 24000;
 const OUTPUT_DIR = path.join(__dirname, 'eval-output');
 const REPORT_PATH = path.join(__dirname, 'eval-report.json');
 
@@ -42,7 +41,7 @@ async function runEval() {
     const tag = `[${String(t.id).padStart(2)}][${t.category}]`;
     process.stdout.write(`${tag} TTS "${t.text.substring(0, 30)}..." `);
 
-    let ttsMs = 0, asrMs = 0, simMs = 0;
+    let ttsMs = 0, asrMs = 0;
     let audioPath = null, recognized = null, similarity = 0, score = 0;
     let error = null;
 
@@ -61,11 +60,9 @@ async function runEval() {
       asrMs = Date.now() - t1;
 
       // Similarity
-      const t2 = Date.now();
       similarity = textSimilarity(t.text, recognized);
-      simMs = Date.now() - t2;
 
-      score = similarity >= 95 ? 95 : similarity >= 80 ? 85 : similarity >= 60 ? 70 : 50;
+      score = similarityToScore(similarity).score;
       const passed = score >= 80;
       if (passed) passCount++;
 
@@ -83,7 +80,7 @@ async function runEval() {
     results.push({
       id: t.id, category: t.category, text: t.text,
       audioPath, recognized, similarity, score, error,
-      ttsMs, asrMs, simMs
+      ttsMs, asrMs
     });
 
     await sleep(500);

@@ -8,8 +8,6 @@ function digitsToChinese(numStr) {
 }
 
 function parseCnNumber(str) {
-  const units = { 十: 10, 百: 100, 千: 1000, 万: 10000, 亿: 100000000 };
-  const digits = { 零: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
   let total = 0;
   let current = 0;
   let pendingNum = '';
@@ -24,12 +22,12 @@ function parseCnNumber(str) {
   for (const ch of str) {
     if (/\d/.test(ch)) {
       pendingNum += ch;
-    } else if (digits[ch] !== undefined) {
+    } else if (CN_DIGITS[ch] !== undefined) {
       flushNum();
-      current = digits[ch];
-    } else if (units[ch]) {
+      current = CN_DIGITS[ch];
+    } else if (CN_UNITS[ch]) {
       flushNum();
-      const u = units[ch];
+      const u = CN_UNITS[ch];
       if (u >= 10000) {
         total = (total + current) * u;
       } else {
@@ -83,13 +81,27 @@ function textSimilarity(a, b) {
   const nb = normalizeText(b);
   if (na.length === 0 || nb.length === 0) return 0;
 
-  const pool = nb.split('');
+  const freqB = new Map();
+  for (const ch of nb) {
+    freqB.set(ch, (freqB.get(ch) || 0) + 1);
+  }
+
   let matches = 0;
   for (const ch of na) {
-    const idx = pool.indexOf(ch);
-    if (idx !== -1) { matches++; pool.splice(idx, 1); }
+    const count = freqB.get(ch) || 0;
+    if (count > 0) {
+      matches++;
+      freqB.set(ch, count - 1);
+    }
   }
   return Math.round((matches / Math.max(na.length, nb.length)) * 100);
 }
 
-module.exports = { normalizeText, textSimilarity };
+module.exports = { normalizeText, textSimilarity, similarityToScore };
+
+function similarityToScore(sim) {
+  if (sim >= 95) return { score: 95, feedback: 'Excellent: near-perfect recognition' };
+  if (sim >= 80) return { score: 85, feedback: 'Good: high recognition accuracy' };
+  if (sim >= 60) return { score: 70, feedback: 'Fair: some words misrecognized' };
+  return { score: 50, feedback: 'Poor: significant recognition errors' };
+}

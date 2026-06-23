@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { EventEmitter } = require('events');
 
 jest.mock('axios');
 jest.mock('fs');
@@ -13,6 +14,23 @@ jest.mock('../config', () => ({
   getNextApiKey: jest.fn(() => 'test-api-key')
 }));
 
+function createMockStream(sseBody) {
+  const stream = new EventEmitter();
+  process.nextTick(() => {
+    const parts = sseBody.split('\n');
+    for (let i = 0; i < parts.length; i++) {
+      const line = parts[i];
+      if (i < parts.length - 1) {
+        stream.emit('data', Buffer.from(line + '\n'));
+      } else if (line) {
+        stream.emit('data', Buffer.from(line));
+      }
+    }
+    stream.emit('end');
+  });
+  return stream;
+}
+
 const { generateSpeech, generatePrompt, transcribeAudio } = require('../api');
 const { loadConfig, getNextApiKey } = require('../config');
 const fs = require('fs');
@@ -26,10 +44,8 @@ describe('API Module', () => {
   describe('generateSpeech', () => {
     it('should call TTS API and return WAV data', async () => {
       const pcmChunk = Buffer.from('fake-pcm-data').toString('base64');
-      const mockStreamResponse = {
-        data: `data: {"choices":[{"delta":{"audio":{"data":"${pcmChunk}"}}}]}\n\ndata: [DONE]\n`
-      };
-      axios.mockResolvedValue(mockStreamResponse);
+      const sseBody = `data: {"choices":[{"delta":{"audio":{"data":"${pcmChunk}"}}}]}\n\ndata: [DONE]\n`;
+      axios.mockResolvedValue({ data: createMockStream(sseBody) });
 
       const result = await generateSpeech('Hello world', 'Gentle voice', {});
 

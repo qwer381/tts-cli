@@ -65,6 +65,44 @@ function pcm16ToWav(pcmBuffer, sampleRate) {
   return wav;
 }
 
+function parseAudioStream(response) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let buffer = '';
+
+    response.data.on('data', (chunk) => {
+      buffer += chunk.toString();
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data: ')) continue;
+        const jsonStr = trimmed.slice(6);
+        if (jsonStr === '[DONE]') continue;
+
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const audio = parsed.choices?.[0]?.delta?.audio;
+          if (audio && audio.data) {
+            chunks.push(Buffer.from(audio.data, 'base64'));
+          }
+        } catch {}
+      }
+    });
+
+    response.data.on('end', () => {
+      if (chunks.length === 0) {
+        reject(new Error('No audio data received from API'));
+        return;
+      }
+      resolve(pcm16ToWav(Buffer.concat(chunks), SAMPLE_RATE));
+    });
+
+    response.data.on('error', reject);
+  });
+}
+
 async function generateSpeech(text, prompt, options = {}) {
   const config = loadConfig();
   const apiKey = getNextApiKey();
@@ -94,36 +132,11 @@ async function generateSpeech(text, prompt, options = {}) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      responseType: 'text',
+      responseType: 'stream',
       ...proxy
     });
 
-    const chunks = [];
-    const lines = response.data.split('\n');
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data: ')) continue;
-      const jsonStr = trimmed.slice(6);
-      if (jsonStr === '[DONE]') break;
-
-      try {
-        const parsed = JSON.parse(jsonStr);
-        const choice = parsed.choices?.[0];
-        const audio = choice?.delta?.audio;
-        if (audio && audio.data) {
-          const pcm = Buffer.from(audio.data, 'base64');
-          chunks.push(pcm);
-        }
-      } catch {}
-    }
-
-    if (chunks.length === 0) {
-      throw new Error('No audio data received from API');
-    }
-
-    const pcmBuffer = Buffer.concat(chunks);
-    return pcm16ToWav(pcmBuffer, SAMPLE_RATE);
+    return parseAudioStream(response);
   });
 }
 
@@ -206,35 +219,10 @@ async function generateSpeechClone(text, referenceAudioPath, prompt, options = {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      responseType: 'text'
+      responseType: 'stream'
     });
 
-    const chunks = [];
-    const lines = response.data.split('\n');
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data: ')) continue;
-      const jsonStr = trimmed.slice(6);
-      if (jsonStr === '[DONE]') break;
-
-      try {
-        const parsed = JSON.parse(jsonStr);
-        const choice = parsed.choices?.[0];
-        const audio = choice?.delta?.audio;
-        if (audio && audio.data) {
-          const pcm = Buffer.from(audio.data, 'base64');
-          chunks.push(pcm);
-        }
-      } catch {}
-    }
-
-    if (chunks.length === 0) {
-      throw new Error('No audio data received from API');
-    }
-
-    const pcmBuffer = Buffer.concat(chunks);
-    return pcm16ToWav(pcmBuffer, SAMPLE_RATE);
+    return parseAudioStream(response);
   });
 }
 
@@ -265,35 +253,10 @@ async function generateSpeechDesign(text, voiceDesign, options = {}) {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      responseType: 'text'
+      responseType: 'stream'
     });
 
-    const chunks = [];
-    const lines = response.data.split('\n');
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data: ')) continue;
-      const jsonStr = trimmed.slice(6);
-      if (jsonStr === '[DONE]') break;
-
-      try {
-        const parsed = JSON.parse(jsonStr);
-        const choice = parsed.choices?.[0];
-        const audio = choice?.delta?.audio;
-        if (audio && audio.data) {
-          const pcm = Buffer.from(audio.data, 'base64');
-          chunks.push(pcm);
-        }
-      } catch {}
-    }
-
-    if (chunks.length === 0) {
-      throw new Error('No audio data received from API');
-    }
-
-    const pcmBuffer = Buffer.concat(chunks);
-    return pcm16ToWav(pcmBuffer, SAMPLE_RATE);
+    return parseAudioStream(response);
   });
 }
 
@@ -333,5 +296,6 @@ module.exports = {
   generateSpeechClone,
   generateSpeechDesign,
   generatePrompt,
-  transcribeAudio
+  transcribeAudio,
+  parseAudioStream
 };

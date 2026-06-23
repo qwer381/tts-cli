@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const api = require('./api');
 const { loadConfig } = require('./config');
-const { textSimilarity } = require('./text-similarity');
+const { textSimilarity, similarityToScore } = require('./text-similarity');
 
 function safeWriteFile(filePath, data) {
   try {
@@ -39,21 +39,7 @@ async function evaluateSpeech(audioPath, originalText) {
     console.log(`📝 Recognized: "${recognized}"`);
 
     const sim = textSimilarity(originalText, recognized);
-
-    let score, feedback;
-    if (sim >= 95) {
-      score = 95;
-      feedback = 'Excellent: near-perfect recognition';
-    } else if (sim >= 80) {
-      score = 85;
-      feedback = 'Good: high recognition accuracy';
-    } else if (sim >= 60) {
-      score = 70;
-      feedback = 'Fair: some words misrecognized';
-    } else {
-      score = 50;
-      feedback = 'Poor: significant recognition errors';
-    }
+    const { score, feedback } = similarityToScore(sim);
 
     return { score, feedback, recognized, similarity: sim };
   } catch (err) {
