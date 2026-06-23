@@ -9,11 +9,12 @@ jest.mock('../config', () => ({
     llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions',
     ttsModel: 'mimo-v2.5-tts',
     llmModel: 'mimo-v2.5-pro'
-  }))
+  })),
+  getNextApiKey: jest.fn(() => 'test-api-key')
 }));
 
 const { generateSpeech, generatePrompt, transcribeAudio } = require('../api');
-const { loadConfig } = require('../config');
+const { loadConfig, getNextApiKey } = require('../config');
 const fs = require('fs');
 
 describe('API Module', () => {
@@ -56,6 +57,7 @@ describe('API Module', () => {
         llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions',
         ttsModel: 'mimo-v2.5-tts'
       });
+      getNextApiKey.mockReturnValueOnce('');
 
       await expect(generateSpeech('Hello', 'Voice', {}))
         .rejects.toThrow('API key not configured');
@@ -111,6 +113,7 @@ describe('API Module', () => {
         llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions',
         llmModel: 'mimo-v2.5-pro'
       });
+      getNextApiKey.mockReturnValueOnce('');
 
       await expect(generatePrompt('Hello', '', ''))
         .rejects.toThrow('API key not configured');
@@ -153,6 +156,7 @@ describe('API Module', () => {
         apiKey: '',
         llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions'
       });
+      getNextApiKey.mockReturnValueOnce('');
 
       await expect(transcribeAudio('/path/to/audio.wav'))
         .rejects.toThrow('API key not configured');

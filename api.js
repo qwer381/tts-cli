@@ -1,6 +1,6 @@
 const axios = require('axios');
 const fs = require('fs');
-const { loadConfig } = require('./config');
+const { loadConfig, getNextApiKey } = require('./config');
 
 const SAMPLE_RATE = 24000;
 
@@ -67,13 +67,15 @@ function pcm16ToWav(pcmBuffer, sampleRate) {
 
 async function generateSpeech(text, prompt, options = {}) {
   const config = loadConfig();
+  const apiKey = getNextApiKey();
 
-  if (!config.apiKey) {
+  if (!apiKey) {
     throw new Error('API key not configured. Run: mimo-tts --set-key YOUR_API_KEY');
   }
 
   const voice = options.voice || 'Chloe';
   const style = prompt || 'Clear, natural narration tone.';
+  const proxy = config.proxy ? { proxy: { host: config.proxy.host, port: config.proxy.port } } : {};
 
   return retryWithBackoff(async () => {
     const response = await axios({
@@ -89,10 +91,11 @@ async function generateSpeech(text, prompt, options = {}) {
         stream: true
       },
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      responseType: 'text'
+      responseType: 'text',
+      ...proxy
     });
 
     const chunks = [];
@@ -126,8 +129,9 @@ async function generateSpeech(text, prompt, options = {}) {
 
 async function generatePrompt(text, currentPrompt = '', feedback = '') {
   const config = loadConfig();
+  const apiKey = getNextApiKey();
 
-  if (!config.apiKey) {
+  if (!apiKey) {
     throw new Error('API key not configured. Run: mimo-tts --set-key YOUR_API_KEY');
   }
 
@@ -162,7 +166,7 @@ Keep prompts concise and effective.`;
         max_tokens: 200
       },
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       }
     });
@@ -172,8 +176,9 @@ Keep prompts concise and effective.`;
 
 async function generateSpeechClone(text, referenceAudioPath, prompt, options = {}) {
   const config = loadConfig();
+  const apiKey = getNextApiKey();
 
-  if (!config.apiKey) {
+  if (!apiKey) {
     throw new Error('API key not configured. Run: mimo-tts --set-key YOUR_API_KEY');
   }
 
@@ -198,7 +203,7 @@ async function generateSpeechClone(text, referenceAudioPath, prompt, options = {
         stream: true
       },
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       responseType: 'text'
@@ -235,8 +240,9 @@ async function generateSpeechClone(text, referenceAudioPath, prompt, options = {
 
 async function generateSpeechDesign(text, voiceDesign, options = {}) {
   const config = loadConfig();
+  const apiKey = getNextApiKey();
 
-  if (!config.apiKey) {
+  if (!apiKey) {
     throw new Error('API key not configured. Run: mimo-tts --set-key YOUR_API_KEY');
   }
 
@@ -256,7 +262,7 @@ async function generateSpeechDesign(text, voiceDesign, options = {}) {
         stream: true
       },
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       responseType: 'text'
@@ -293,8 +299,9 @@ async function generateSpeechDesign(text, voiceDesign, options = {}) {
 
 async function transcribeAudio(audioPath) {
   const config = loadConfig();
+  const apiKey = getNextApiKey();
 
-  if (!config.apiKey) {
+  if (!apiKey) {
     throw new Error('API key not configured. Run: mimo-tts --set-key YOUR_API_KEY');
   }
 
@@ -313,7 +320,7 @@ async function transcribeAudio(audioPath) {
         }]
       },
       headers: {
-        'Authorization': `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       }
     });

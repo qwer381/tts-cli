@@ -5,7 +5,7 @@ const chalk = require('chalk');
 const ora = require('ora');
 const { optimizeLoop } = require('./optimizer');
 const { generateSpeech, generateSpeechClone, generateSpeechDesign } = require('./api');
-const { loadConfig, setConfigValue, getConfigValue } = require('./config');
+const { loadConfig, setConfigValue, getConfigValue, addApiKey, removeApiKey } = require('./config');
 
 let verbose = false;
 function log(...args) {
@@ -33,6 +33,10 @@ program
   .option('--auto', 'Auto-optimize without confirmation', true)
   .option('--manual', 'Manual optimization mode')
   .option('--set-key <key>', 'Set API key')
+  .option('--add-key <key>', 'Add API key for rotation')
+  .option('--remove-key <key>', 'Remove API key from rotation')
+  .option('--list-keys', 'List all API keys')
+  .option('--set-proxy <url>', 'Set proxy (e.g. http://127.0.0.1:7890)')
   .option('--show-config', 'Show current configuration')
   .option('--verbose', 'Verbose output')
   .action(async (text, options) => {
@@ -42,6 +46,47 @@ program
     if (options.setKey) {
       setConfigValue('apiKey', options.setKey);
       console.log(chalk.green('API key saved successfully'));
+      return;
+    }
+
+    if (options.addKey) {
+      const count = addApiKey(options.addKey);
+      console.log(chalk.green(`API key added. Total keys: ${count}`));
+      return;
+    }
+
+    if (options.removeKey) {
+      const removed = removeApiKey(options.removeKey);
+      if (removed) {
+        console.log(chalk.green('API key removed'));
+      } else {
+        console.log(chalk.yellow('API key not found'));
+      }
+      return;
+    }
+
+    if (options.listKeys) {
+      const config = loadConfig();
+      const keys = config.apiKeys || [];
+      if (keys.length === 0) {
+        console.log(chalk.yellow('No rotation keys configured'));
+      } else {
+        console.log(chalk.blue('\nAPI Keys:'));
+        keys.forEach((key, i) => {
+          console.log(`  ${i + 1}. ${key.substring(0, 8)}...${key.substring(key.length - 4)}`);
+        });
+      }
+      return;
+    }
+
+    if (options.setProxy) {
+      try {
+        const url = new URL(options.setProxy);
+        setConfigValue('proxy', { host: url.hostname, port: parseInt(url.port) || 80 });
+        console.log(chalk.green(`Proxy set: ${url.hostname}:${url.port}`));
+      } catch {
+        console.log(chalk.red('Invalid proxy URL. Use format: http://host:port'));
+      }
       return;
     }
 
