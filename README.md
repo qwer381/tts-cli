@@ -33,6 +33,9 @@ node cli.js --set-key YOUR_API_KEY
 
 # Verify installation
 node cli.js --show-config
+
+# Quick test
+node cli.js "你好，测试一下" --iterations 1 --quality 0
 ```
 
 ### Optional: Global Install
@@ -54,7 +57,14 @@ node cli.js --set-key YOUR_API_KEY
 Or use environment variable:
 
 ```bash
+# Linux/macOS
 export MIMO_API_KEY=YOUR_API_KEY
+
+# Windows (PowerShell)
+$env:MIMO_API_KEY="YOUR_API_KEY"
+
+# Windows (CMD)
+set MIMO_API_KEY=YOUR_API_KEY
 ```
 
 View current configuration:
@@ -105,10 +115,15 @@ node cli.js "要合成的文本" --clone reference.wav --iterations 3 --quality 
 ### Batch Processing
 
 ```bash
-# Synthesize multiple texts
+# Linux/macOS
 for text in "你好" "谢谢" "再见"; do
   node cli.js "$text" -o "output/${text}.wav"
 done
+
+# Windows (PowerShell)
+foreach ($text in "你好", "谢谢", "再见") {
+  node cli.js $text -o "output/$text.wav"
+}
 ```
 
 ### Custom Output Path
