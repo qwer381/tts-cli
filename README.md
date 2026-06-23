@@ -12,9 +12,35 @@ CLI tool for MiMo-V2.5-TTS with voice clone, auto-prompt optimization, and ASR-b
 
 ## Installation
 
+### Prerequisites
+
+- Node.js >= 18
+- npm
+- MiMo API key (get one from [Xiaomi MiMo platform](https://platform.xiaomimimo.com))
+
+### Steps
+
 ```bash
+# Clone the repository
+git clone https://github.com/qwer381/tts-cli.git
 cd tts-cli
+
+# Install dependencies
 npm install
+
+# Set your API key
+node cli.js --set-key YOUR_API_KEY
+
+# Verify installation
+node cli.js --show-config
+```
+
+### Optional: Global Install
+
+```bash
+npm link
+# Now you can use 'mimo-tts' command globally
+mimo-tts --show-config
 ```
 
 ## Configuration
@@ -23,6 +49,12 @@ Set your API key:
 
 ```bash
 node cli.js --set-key YOUR_API_KEY
+```
+
+Or use environment variable:
+
+```bash
+export MIMO_API_KEY=YOUR_API_KEY
 ```
 
 View current configuration:
@@ -36,13 +68,23 @@ node cli.js --show-config
 ### Basic TTS
 
 ```bash
+# Simple text-to-speech
 node cli.js "你好，今天天气怎么样？"
+
+# Output: output/speech_1782182661593.wav
 ```
 
-### With Custom Prompt
+### With Custom Voice Prompt
 
 ```bash
+# Use a specific voice style
 node cli.js "你好世界" --prompt "温柔的女声"
+
+# Professional narration style
+node cli.js "各位观众大家好" --prompt "专业新闻播报风格，沉稳大气"
+
+# Friendly conversation style
+node cli.js "嘿，最近怎么样？" --prompt "轻松友好的聊天语气"
 ```
 
 ### Voice Clone
@@ -50,25 +92,43 @@ node cli.js "你好世界" --prompt "温柔的女声"
 Clone a voice from a reference audio file:
 
 ```bash
+# Basic voice clone
 node cli.js "要合成的文本" --clone reference.wav
+
+# Voice clone with custom prompt
+node cli.js "要合成的文本" --clone reference.wav --prompt "保持自然语调"
+
+# Voice clone with quality optimization
+node cli.js "要合成的文本" --clone reference.wav --iterations 3 --quality 90
 ```
 
-With optimization:
+### Batch Processing
 
 ```bash
-node cli.js "要合成的文本" --clone reference.wav --iterations 3 --quality 90
+# Synthesize multiple texts
+for text in "你好" "谢谢" "再见"; do
+  node cli.js "$text" -o "output/${text}.wav"
+done
 ```
 
 ### Custom Output Path
 
 ```bash
-node cli.js "你好" -o ./output.wav
+node cli.js "你好" -o ./my-audio.wav
+node cli.js "你好" -o ~/Desktop/output.wav
 ```
 
-### Custom Optimization Settings
+### Quality Optimization
 
 ```bash
-node cli.js "你好" --iterations 10 --quality 90
+# Higher quality threshold (more iterations to reach target)
+node cli.js "重要演示内容" --quality 95
+
+# More iterations for better results
+node cli.js "长文本内容" --iterations 10
+
+# Both settings
+node cli.js "关键内容" --iterations 10 --quality 95
 ```
 
 ## Options
