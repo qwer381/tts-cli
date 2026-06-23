@@ -25,7 +25,7 @@ describe('Optimizer Module', () => {
         outputDir: './output'
       });
 
-      expect(result).toContain('.mp3');
+      expect(result).toContain('.wav');
       expect(api.generateSpeech).toHaveBeenCalled();
     });
 
@@ -45,7 +45,7 @@ describe('Optimizer Module', () => {
 
   describe('evaluateSpeech', () => {
     it('should return quality score and feedback', async () => {
-      const result = await evaluateSpeech('/path/to/audio.mp3');
+      const result = await evaluateSpeech('/path/to/audio.wav');
 
       expect(result).toHaveProperty('score');
       expect(result).toHaveProperty('feedback');

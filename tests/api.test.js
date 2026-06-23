@@ -1,38 +1,46 @@
 const axios = require('axios');
 
 jest.mock('axios');
+jest.mock('fs');
 jest.mock('../config', () => ({
   loadConfig: jest.fn(() => ({
     apiKey: 'test-api-key',
-    ttsEndpoint: 'https://api.mimovoice.com/v1/audio/speech',
-    llmEndpoint: 'https://api.mimovoice.com/v1/chat/completions',
+    ttsEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/audio/speech',
+    llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions',
     ttsModel: 'mimo-v2.5-tts',
-    llmModel: 'MiMo-V2.5-Pro'
+    llmModel: 'mimo-v2.5-pro'
   }))
 }));
 
-const { generateSpeech, generatePrompt } = require('../api');
+const { generateSpeech, generatePrompt, transcribeAudio } = require('../api');
 const { loadConfig } = require('../config');
+const fs = require('fs');
 
 describe('API Module', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.setTimeout(15000); // Increase timeout for retry tests
+    jest.setTimeout(15000);
   });
 
   describe('generateSpeech', () => {
-    it('should call TTS API and return audio data', async () => {
-      const mockAudioData = Buffer.from('fake-audio-data');
-      axios.mockResolvedValue({ data: mockAudioData });
+    it('should call TTS API and return WAV data', async () => {
+      const pcmChunk = Buffer.from('fake-pcm-data').toString('base64');
+      const mockStreamResponse = {
+        data: `data: {"choices":[{"delta":{"audio":{"data":"${pcmChunk}"}}}]}\n\ndata: [DONE]\n`
+      };
+      axios.mockResolvedValue(mockStreamResponse);
 
       const result = await generateSpeech('Hello world', 'Gentle voice', {});
 
       expect(axios).toHaveBeenCalledWith(expect.objectContaining({
         method: 'POST',
-        url: expect.stringContaining('/audio/speech'),
-        responseType: 'arraybuffer'
+        url: expect.stringContaining('/chat/completions'),
+        data: expect.objectContaining({
+          model: 'mimo-v2.5-tts',
+          audio: expect.objectContaining({ format: 'pcm16' })
+        })
       }));
-      expect(result).toEqual(mockAudioData);
+      expect(result).toBeInstanceOf(Buffer);
     });
 
     it('should throw error on API failure', async () => {
@@ -45,26 +53,12 @@ describe('API Module', () => {
     it('should throw error when API key is missing', async () => {
       loadConfig.mockReturnValueOnce({
         apiKey: '',
-        ttsEndpoint: 'https://api.mimovoice.com/v1/audio/speech',
+        llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions',
         ttsModel: 'mimo-v2.5-tts'
       });
 
       await expect(generateSpeech('Hello', 'Voice', {}))
         .rejects.toThrow('API key not configured');
-    });
-
-    it('should pass options to the API call', async () => {
-      const mockAudioData = Buffer.from('audio');
-      axios.mockResolvedValue({ data: mockAudioData });
-
-      await generateSpeech('Hello', 'Warm voice', { format: 'wav', speed: 1.5 });
-
-      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
-        data: expect.objectContaining({
-          response_format: 'wav',
-          speed: 1.5
-        })
-      }));
     });
   });
 
@@ -85,7 +79,10 @@ describe('API Module', () => {
 
       expect(axios).toHaveBeenCalledWith(expect.objectContaining({
         method: 'POST',
-        url: expect.stringContaining('/chat/completions')
+        url: expect.stringContaining('/chat/completions'),
+        data: expect.objectContaining({
+          model: 'mimo-v2.5-pro'
+        })
       }));
       expect(result).toContain('Optimized prompt');
     });
@@ -111,8 +108,8 @@ describe('API Module', () => {
     it('should throw error when API key is missing', async () => {
       loadConfig.mockReturnValueOnce({
         apiKey: '',
-        llmEndpoint: 'https://api.mimovoice.com/v1/chat/completions',
-        llmModel: 'MiMo-V2.5-Pro'
+        llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions',
+        llmModel: 'mimo-v2.5-pro'
       });
 
       await expect(generatePrompt('Hello', '', ''))
@@ -125,5 +122,40 @@ describe('API Module', () => {
       await expect(generatePrompt('Hello', '', ''))
         .rejects.toThrow('LLM Error');
     }, 15000);
+  });
+
+  describe('transcribeAudio', () => {
+    it('should call ASR API and return recognized text', async () => {
+      fs.readFileSync.mockReturnValue(Buffer.from('fake-wav-data'));
+      const mockResponse = {
+        data: {
+          choices: [{
+            message: { content: 'Recognized text' }
+          }]
+        }
+      };
+      axios.mockResolvedValue(mockResponse);
+
+      const result = await transcribeAudio('/path/to/audio.wav');
+
+      expect(axios).toHaveBeenCalledWith(expect.objectContaining({
+        method: 'POST',
+        url: expect.stringContaining('/chat/completions'),
+        data: expect.objectContaining({
+          model: 'mimo-v2.5-asr'
+        })
+      }));
+      expect(result).toBe('Recognized text');
+    });
+
+    it('should throw error when API key is missing', async () => {
+      loadConfig.mockReturnValueOnce({
+        apiKey: '',
+        llmEndpoint: 'https://token-plan-cn.xiaomimimo.com/v1/chat/completions'
+      });
+
+      await expect(transcribeAudio('/path/to/audio.wav'))
+        .rejects.toThrow('API key not configured');
+    });
   });
 });

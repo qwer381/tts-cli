@@ -12,6 +12,7 @@ describe('Integration Tests', () => {
     fs.writeFileSync.mockImplementation(() => {});
     fs.statSync.mockReturnValue({ size: 50 * 1024 });
     fs.mkdirSync.mockImplementation(() => {});
+    api.transcribeAudio.mockResolvedValue('Test text');
   });
 
   it('should complete full optimization loop', async () => {
@@ -25,7 +26,7 @@ describe('Integration Tests', () => {
     });
 
     expect(result).toBeDefined();
-    expect(result).toContain('.mp3');
+    expect(result).toContain('.wav');
     expect(api.generateSpeech).toHaveBeenCalled();
     expect(api.generatePrompt).toHaveBeenCalled();
   });
@@ -44,6 +45,7 @@ describe('Integration Tests', () => {
     const mockAudio = Buffer.from('test-audio');
     api.generateSpeech.mockResolvedValue(mockAudio);
     api.generatePrompt.mockResolvedValue('Optimized prompt');
+    api.transcribeAudio.mockResolvedValue('different text');
 
     await optimizeLoop('Test text', {
       maxIterations: 3,
