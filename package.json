@@ -1,7 +1,7 @@
 {
   "name": "mimo-tts-cli",
-  "version": "1.0.0",
-  "description": "CLI tool for mimo-v2.5-tts with auto-prompt optimization",
+  "version": "1.1.0",
+  "description": "CLI tool for MiMo-V2.5-TTS with voice clone, voice design, batch processing, and ASR quality evaluation",
   "main": "cli.js",
   "bin": {
     "mimo-tts": "./cli.js"
@@ -21,6 +21,6 @@
   "devDependencies": {
     "jest": "^29.0.0"
   },
-  "keywords": ["tts", "mimo", "voice", "ai"],
+  "keywords": ["tts", "mimo", "voice", "ai", "voiceclone", "batch"],
   "license": "MIT"
 }

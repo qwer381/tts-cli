@@ -1,5 +1,7 @@
 # MIMO TTS CLI
 
+[![CI](https://github.com/qwer381/tts-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/qwer381/tts-cli/actions/workflows/ci.yml)
+
 CLI tool for MiMo-V2.5-TTS with voice clone, auto-prompt optimization, and ASR-based quality evaluation.
 
 ## Features
@@ -8,10 +10,12 @@ CLI tool for MiMo-V2.5-TTS with voice clone, auto-prompt optimization, and ASR-b
 - **Voice Clone** — Clone any voice from a reference audio via `mimo-v2.5-tts-voiceclone`
 - **Voice Design** — Design custom voices via `mimo-v2.5-tts-voicedesign`
 - **Multi-Voice Selection** — Choose from different built-in voices
-- **Batch Processing** — Synthesize multiple texts from a file
+- **Batch Processing** — Synthesize multiple texts from a file with concurrency
 - **Auto Prompt Optimization** — Uses `mimo-v2.5-pro` to generate and optimize voice prompts
 - **ASR Quality Evaluation** — Uses `mimo-v2.5-asr` to verify speech accuracy
-- **Text Similarity** — Chinese number normalization for accurate comparison (handles "十万" vs "100000", "3万1千零29" vs "31029")
+- **Text Similarity** — Chinese number normalization for accurate comparison
+- **Multi-API Key Rotation** — Rotate multiple API keys for higher throughput
+- **Proxy Support** — HTTP proxy for network environments
 
 ## Installation
 
@@ -68,6 +72,31 @@ $env:MIMO_API_KEY="YOUR_API_KEY"
 
 # Windows (CMD)
 set MIMO_API_KEY=YOUR_API_KEY
+```
+
+### Multi-API Key Rotation
+
+Add multiple API keys for automatic rotation (higher throughput):
+
+```bash
+# Add API keys
+node cli.js --add-key KEY1
+node cli.js --add-key KEY2
+node cli.js --add-key KEY3
+
+# List all keys
+node cli.js --list-keys
+
+# Remove a key
+node cli.js --remove-key KEY2
+```
+
+### Proxy Support
+
+Set HTTP proxy for network environments:
+
+```bash
+node cli.js --set-proxy http://127.0.0.1:7890
 ```
 
 View current configuration:
@@ -170,20 +199,6 @@ PowerShell:
 node cli.js --batch texts.txt
 ```
 
-### Batch Processing
-
-```bash
-# Linux/macOS
-for text in "你好" "谢谢" "再见"; do
-  node cli.js "$text" -o "output/${text}.wav"
-done
-
-# Windows (PowerShell)
-foreach ($text in "你好", "谢谢", "再见") {
-  node cli.js $text -o "output/$text.wav"
-}
-```
-
 ### Custom Output Path
 
 ```bash
@@ -220,6 +235,10 @@ node cli.js "关键内容" --iterations 10 --quality 95
 | `--auto` | Auto-optimize without confirmation (default) |
 | `--manual` | Manual optimization mode |
 | `--set-key <key>` | Set API key |
+| `--add-key <key>` | Add API key for rotation |
+| `--remove-key <key>` | Remove API key from rotation |
+| `--list-keys` | List all API keys |
+| `--set-proxy <url>` | Set proxy (e.g. http://127.0.0.1:7890) |
 | `--show-config` | Show current configuration |
 | `--verbose` | Verbose output |
 
@@ -280,6 +299,9 @@ tts-cli/
 ├── package.json
 ├── README.md
 ├── LICENSE
+├── .github/
+│   └── workflows/
+│       └── ci.yml      # GitHub Actions CI
 ├── tests/
 │   ├── api.test.js
 │   ├── cli.test.js
