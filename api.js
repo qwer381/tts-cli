@@ -9,10 +9,31 @@ async function retryWithBackoff(fn, maxRetries = 3) {
     try {
       return await fn();
     } catch (err) {
-      if (attempt === maxRetries) throw err;
-      const delay = Math.pow(2, attempt) * 1000;
-      console.error(`Attempt ${attempt} failed, retrying in ${delay / 1000}s...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      const status = err.response?.status;
+      const errMsg = err.response?.data?.error?.message || err.message;
+
+      // Rate limit - wait longer
+      if (status === 429) {
+        const retryAfter = parseInt(err.response.headers['retry-after'] || '5') * 1000;
+        const delay = Math.max(retryAfter, Math.pow(2, attempt) * 1000);
+        console.error(`⏳ Rate limited, waiting ${Math.ceil(delay / 1000)}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+
+      // Invalid API key - don't retry
+      if (status === 401) {
+        throw new Error(`Invalid API key. Run: mimo-tts --set-key YOUR_API_KEY`);
+      }
+
+      // Other errors - retry with backoff
+      if (attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        console.error(`Attempt ${attempt}/${maxRetries} failed: ${errMsg}, retrying in ${delay / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw new Error(`API error after ${maxRetries} attempts: ${errMsg}`);
+      }
     }
   }
 }

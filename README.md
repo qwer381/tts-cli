@@ -151,6 +151,9 @@ echo "春眠不觉晓，处处闻啼鸟。" >> texts.txt
 
 # Run batch processing
 node cli.js --batch texts.txt
+
+# With concurrency (3 parallel requests)
+node cli.js --batch texts.txt --concurrent 3
 ```
 
 PowerShell:
@@ -211,12 +214,14 @@ node cli.js "关键内容" --iterations 10 --quality 95
 | `-c, --clone <ref-audio>` | Voice clone mode: path to reference audio |
 | `-d, --design <description>` | Voice design mode: describe the desired voice |
 | `-b, --batch <file>` | Batch mode: read texts from file (one per line) |
+| `-n, --concurrent <n>` | Concurrent requests for batch mode (default: 1) |
 | `-i, --iterations <n>` | Maximum optimization iterations (default: 5) |
 | `-q, --quality <n>` | Quality threshold 0-100 (default: 80) |
 | `--auto` | Auto-optimize without confirmation (default) |
 | `--manual` | Manual optimization mode |
 | `--set-key <key>` | Set API key |
 | `--show-config` | Show current configuration |
+| `--verbose` | Verbose output |
 
 ## API Reference
 
