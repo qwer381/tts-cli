@@ -204,6 +204,28 @@ Results: 15/15 pass, average similarity 98%, average score 92/100.
 | Recipes | 93% | 85 |
 | Weather | 94% | 85 |
 
+## Project Structure
+
+```
+tts-cli/
+├── cli.js              # CLI entry point
+├── api.js              # API calls (TTS, VoiceClone, ASR)
+├── optimizer.js        # Auto-prompt optimization loop
+├── config.js           # Configuration management
+├── text-similarity.js  # Text normalization and similarity
+├── eval.js             # Evaluation suite (15 test cases)
+├── package.json
+├── README.md
+├── LICENSE
+├── tests/
+│   ├── api.test.js
+│   ├── cli.test.js
+│   ├── optimizer.test.js
+│   └── integration.test.js
+├── eval-report.json    # Latest evaluation results
+└── output/             # Generated audio files
+```
+
 ## Development
 
 ```bash
