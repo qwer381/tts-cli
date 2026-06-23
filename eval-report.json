@@ -1,0 +1,235 @@
+{
+  "timestamp": "2026-06-23T15:48:45.597Z",
+  "summary": {
+    "passCount": 14,
+    "total": 15,
+    "avgSim": 98,
+    "avgScore": 93,
+    "avgTts": 2044,
+    "avgAsr": 951
+  },
+  "categories": {
+    "日常口语": {
+      "avgSimilarity": 100,
+      "avgScore": 95
+    },
+    "古诗词": {
+      "avgSimilarity": 100,
+      "avgScore": 95
+    },
+    "新闻播报": {
+      "avgSimilarity": 98,
+      "avgScore": 95
+    },
+    "数字日期": {
+      "avgSimilarity": 100,
+      "avgScore": 95
+    },
+    "科技": {
+      "avgSimilarity": 98,
+      "avgScore": 95
+    },
+    "长文本": {
+      "avgSimilarity": 98,
+      "avgScore": 95
+    },
+    "儿歌": {
+      "avgSimilarity": 100,
+      "avgScore": 95
+    },
+    "绕口令": {
+      "avgSimilarity": 77,
+      "avgScore": 70
+    },
+    "菜谱": {
+      "avgSimilarity": 100,
+      "avgScore": 95
+    },
+    "天气预报": {
+      "avgSimilarity": 100,
+      "avgScore": 95
+    }
+  },
+  "results": [
+    {
+      "id": 1,
+      "category": "日常口语",
+      "text": "你好，今天天气怎么样？",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_01.wav",
+      "recognized": "你好，今天天气怎么样？",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1221,
+      "asrMs": 522
+    },
+    {
+      "id": 2,
+      "category": "日常口语",
+      "text": "今天我去了一家新开的咖啡店，点了一杯美式和一份提拉米苏，味道还不错，推荐给大家。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_02.wav",
+      "recognized": "今天我去了一家新开的咖啡店，点了一杯美式和一份提拉米苏，味道还不错，推荐给大家。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1576,
+      "asrMs": 900
+    },
+    {
+      "id": 3,
+      "category": "古诗词",
+      "text": "春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_03.wav",
+      "recognized": "春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1758,
+      "asrMs": 833
+    },
+    {
+      "id": 4,
+      "category": "古诗词",
+      "text": "床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_04.wav",
+      "recognized": "床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 2117,
+      "asrMs": 950
+    },
+    {
+      "id": 5,
+      "category": "新闻播报",
+      "text": "各位观众大家好，欢迎收看今天的新闻联播。首先来看国内消息，我国科学家在量子计算领域取得重大突破。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_05.wav",
+      "recognized": "各位观众，大家好，欢迎收看今天的新闻联播。首先来看国内消息，我国科学家在量子计算领域取得重大突破。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 2399,
+      "asrMs": 1013
+    },
+    {
+      "id": 6,
+      "category": "新闻播报",
+      "text": "据报道，北京时间今天凌晨3点47分，一颗直径约2.5公里的小行星以每秒15.3公里的速度掠过地球。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_06.wav",
+      "recognized": "据报道，北京时间今天凌晨三点四十七分，一颗直径约二点五公里的小行星以每秒十五点三公里的速度掠过地球。",
+      "similarity": 96,
+      "score": 95,
+      "error": null,
+      "ttsMs": 2701,
+      "asrMs": 971
+    },
+    {
+      "id": 7,
+      "category": "数字日期",
+      "text": "今天是2026年6月23日，星期二。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_07.wav",
+      "recognized": "今天是二零二六年六月二十三日，星期二。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1212,
+      "asrMs": 601
+    },
+    {
+      "id": 8,
+      "category": "数字日期",
+      "text": "联系电话是13800138000，邮编100000。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_08.wav",
+      "recognized": "联系电话是13800138000，邮编十万。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1383,
+      "asrMs": 740
+    },
+    {
+      "id": 9,
+      "category": "科技",
+      "text": "小米公司发布了最新的MiMo大模型，在多项基准测试中表现优异，特别是在中文理解和语音合成方面。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_09.wav",
+      "recognized": "小米公司发布了最新的MEMO大模型，在多项基准测试中表现优异，特别是在中文理解和语音合成方面。",
+      "similarity": 95,
+      "score": 95,
+      "error": null,
+      "ttsMs": 2241,
+      "asrMs": 924
+    },
+    {
+      "id": 10,
+      "category": "科技",
+      "text": "人工智能正在深刻改变我们的生活方式，从智能家居到自动驾驶，从医疗诊断到教育创新，AI技术无处不在。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_10.wav",
+      "recognized": "人工智能正在深刻改变我们的生活方式。从智能家居到自动驾驶，从医疗诊断到教育创新，AI技术无处不在。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 2190,
+      "asrMs": 1028
+    },
+    {
+      "id": 11,
+      "category": "长文本",
+      "text": "各位观众大家好，欢迎收看今天的新闻联播。首先来看国内消息，我国科学家在量子计算领域取得重大突破，成功研制出新一代超导量子处理器。该处理器拥有超过1000个量子比特，运算速度比上一代提升了10倍，为实现通用量子计算奠定了坚实基础。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_11.wav",
+      "recognized": "观众大家好，欢迎收看今天的新闻联播。首先来看国内消息，我国科学家在量子计算领域取得重大突破，成功研制出新一代超导量子处理器。该处理器拥有超过一千个量子比特，运算速度比上一代提升了十倍，为实现通用量子计算奠定了坚实基础。",
+      "similarity": 98,
+      "score": 95,
+      "error": null,
+      "ttsMs": 4074,
+      "asrMs": 1819
+    },
+    {
+      "id": 12,
+      "category": "儿歌",
+      "text": "小星星，亮晶晶，满天都是小星星，挂在天空放光明，好像许多小眼睛。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_12.wav",
+      "recognized": "小星星，亮晶晶，满天都是小星星，挂在天空放光明，好像许多小眼睛。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1964,
+      "asrMs": 945
+    },
+    {
+      "id": 13,
+      "category": "绕口令",
+      "text": "四是四，十是十，十四是十四，四十是四十。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_13.wav",
+      "recognized": "四十四，十是十，十四是十四，四十是四十。",
+      "similarity": 77,
+      "score": 70,
+      "error": null,
+      "ttsMs": 1661,
+      "asrMs": 813
+    },
+    {
+      "id": 14,
+      "category": "菜谱",
+      "text": "首先将鸡蛋打入碗中，加入少许盐和料酒，搅拌均匀。然后热锅凉油，倒入蛋液，翻炒至金黄色即可出锅。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_14.wav",
+      "recognized": "首先将鸡蛋打入碗中，加入少许盐和料酒，搅拌均匀。然后热锅凉油，倒入蛋液，翻炒至金黄色即可出锅。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 2180,
+      "asrMs": 1276
+    },
+    {
+      "id": 15,
+      "category": "天气预报",
+      "text": "今天白天多云转晴，最高气温32度，最低气温24度，东南风3到4级，空气质量良好。",
+      "audioPath": "D:\\UserData\\Desktop\\mimo\\tts-cli\\eval-output\\case_15.wav",
+      "recognized": "今天白天多云转晴，最高气温三十二度，最低气温二十四度，东南风三到四级，空气质量良好。",
+      "similarity": 100,
+      "score": 95,
+      "error": null,
+      "ttsMs": 1979,
+      "asrMs": 926
+    }
+  ]
+}
