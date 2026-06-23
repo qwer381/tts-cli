@@ -212,6 +212,64 @@ async function generateSpeechClone(text, referenceAudioPath, prompt, options = {
   });
 }
 
+async function generateSpeechDesign(text, voiceDesign, options = {}) {
+  const config = loadConfig();
+
+  if (!config.apiKey) {
+    throw new Error('API key not configured. Run: mimo-tts --set-key YOUR_API_KEY');
+  }
+
+  const style = voiceDesign || 'A clear, natural voice.';
+
+  return retryWithBackoff(async () => {
+    const response = await axios({
+      method: 'POST',
+      url: config.llmEndpoint,
+      data: {
+        model: 'mimo-v2.5-tts-voicedesign',
+        messages: [
+          { role: 'user', content: style },
+          { role: 'assistant', content: text }
+        ],
+        audio: { format: 'pcm16' },
+        stream: true
+      },
+      headers: {
+        'Authorization': `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      responseType: 'text'
+    });
+
+    const chunks = [];
+    const lines = response.data.split('\n');
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data: ')) continue;
+      const jsonStr = trimmed.slice(6);
+      if (jsonStr === '[DONE]') break;
+
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const choice = parsed.choices?.[0];
+        const audio = choice?.delta?.audio;
+        if (audio && audio.data) {
+          const pcm = Buffer.from(audio.data, 'base64');
+          chunks.push(pcm);
+        }
+      } catch {}
+    }
+
+    if (chunks.length === 0) {
+      throw new Error('No audio data received from API');
+    }
+
+    const pcmBuffer = Buffer.concat(chunks);
+    return pcm16ToWav(pcmBuffer, SAMPLE_RATE);
+  });
+}
+
 async function transcribeAudio(audioPath) {
   const config = loadConfig();
 
@@ -245,6 +303,7 @@ async function transcribeAudio(audioPath) {
 module.exports = {
   generateSpeech,
   generateSpeechClone,
+  generateSpeechDesign,
   generatePrompt,
   transcribeAudio
 };

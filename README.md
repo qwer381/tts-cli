@@ -6,6 +6,9 @@ CLI tool for MiMo-V2.5-TTS with voice clone, auto-prompt optimization, and ASR-b
 
 - **TTS Synthesis** — Text-to-speech via `mimo-v2.5-tts`
 - **Voice Clone** — Clone any voice from a reference audio via `mimo-v2.5-tts-voiceclone`
+- **Voice Design** — Design custom voices via `mimo-v2.5-tts-voicedesign`
+- **Multi-Voice Selection** — Choose from different built-in voices
+- **Batch Processing** — Synthesize multiple texts from a file
 - **Auto Prompt Optimization** — Uses `mimo-v2.5-pro` to generate and optimize voice prompts
 - **ASR Quality Evaluation** — Uses `mimo-v2.5-asr` to verify speech accuracy
 - **Text Similarity** — Chinese number normalization for accurate comparison (handles "十万" vs "100000", "3万1千零29" vs "31029")
@@ -112,6 +115,58 @@ node cli.js "要合成的文本" --clone reference.wav --prompt "保持自然语
 node cli.js "要合成的文本" --clone reference.wav --iterations 3 --quality 90
 ```
 
+### Voice Design
+
+Design a custom voice:
+
+```bash
+# Design a warm, friendly female voice
+node cli.js "你好，这是声音设计测试。" --design "温暖亲切的年轻女声，语速适中，带微笑语调"
+
+# Design a professional male narrator
+node cli.js "各位观众大家好" --design "沉稳大气的男性播音员，语速稍慢，吐字清晰"
+```
+
+### Multi-Voice Selection
+
+Choose from different built-in voices:
+
+```bash
+# Use default voice (Chloe)
+node cli.js "你好"
+
+# Use a specific voice
+node cli.js "你好" --voice Chloe
+```
+
+### Batch Processing
+
+Process multiple texts from a file:
+
+```bash
+# Create a text file with one sentence per line
+echo "你好，今天天气怎么样？" > texts.txt
+echo "小米公司发布了最新的MiMo大模型。" >> texts.txt
+echo "春眠不觉晓，处处闻啼鸟。" >> texts.txt
+
+# Run batch processing
+node cli.js --batch texts.txt
+```
+
+PowerShell:
+
+```powershell
+# Create a text file
+@"
+你好，今天天气怎么样？
+小米公司发布了最新的MiMo大模型。
+春眠不觉晓，处处闻啼鸟。
+"@ | Out-File -Encoding utf8 texts.txt
+
+# Run batch processing
+node cli.js --batch texts.txt
+```
+
 ### Batch Processing
 
 ```bash
@@ -152,7 +207,10 @@ node cli.js "关键内容" --iterations 10 --quality 95
 |--------|-------------|
 | `-o, --output <path>` | Output file path |
 | `-p, --prompt <prompt>` | Initial voice prompt |
+| `-v, --voice <name>` | Voice name (default: Chloe) |
 | `-c, --clone <ref-audio>` | Voice clone mode: path to reference audio |
+| `-d, --design <description>` | Voice design mode: describe the desired voice |
+| `-b, --batch <file>` | Batch mode: read texts from file (one per line) |
 | `-i, --iterations <n>` | Maximum optimization iterations (default: 5) |
 | `-q, --quality <n>` | Quality threshold 0-100 (default: 80) |
 | `--auto` | Auto-optimize without confirmation (default) |
