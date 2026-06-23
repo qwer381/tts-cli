@@ -1,0 +1,26 @@
+{
+  "name": "mimo-tts-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for mimo-v2.5-tts with auto-prompt optimization",
+  "main": "cli.js",
+  "bin": {
+    "mimo-tts": "./cli.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "start": "node cli.js",
+    "lint": "echo 'No linter configured'",
+    "build": "echo 'No build step needed'"
+  },
+  "dependencies": {
+    "axios": "^1.18.0",
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "keywords": ["tts", "mimo", "voice", "ai"],
+  "license": "MIT"
+}
